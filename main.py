@@ -1,9 +1,6 @@
-import tkinter as tk
-from MassType import MassType
-from tkinter import messagebox
-import sys
-from tkinter import BOTH
 from Game import Game
+
+import tkinter as tk
 
 if __name__ == "__main__":
 	root = tk.Tk()
