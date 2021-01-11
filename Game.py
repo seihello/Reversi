@@ -1,5 +1,3 @@
-from BButton import BButton
-from BLabel import BLabel
 from Board import *
 from Common import Common
 from GUI import GUI
@@ -8,7 +6,7 @@ from Player import Player, PlayerType
 from Strategy import StrategyType
 from Util import Util
 
-import pygame
+#import pygame
 
 
 class Game:
@@ -28,10 +26,10 @@ class Game:
 	def start_app(self):
 
 		# BGMの再生を開始
-		pygame.mixer.init()
-		pygame.mixer.music.set_volume(0.10)
-		self.bgm = pygame.mixer.Sound('bgm.wav')
-		self.bgm.play(-1)
+		# pygame.mixer.init()
+		# pygame.mixer.music.set_volume(0.10)
+		# self.bgm = pygame.mixer.Sound('bgm.wav')
+		# self.bgm.play(-1)
 
 		# Top画面を表示
 		self.gui.show_top()

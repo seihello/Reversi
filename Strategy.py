@@ -205,7 +205,7 @@ class BalanceEvaluation(Strategy):
         return x, y
 
 # 駒配置アルゴリズム
-#
+# BalanceEvaluationと同じだが、角が取れるなら強制的に取る
 class Flexible(Strategy):
 
     def __init__(self, mass_type):
