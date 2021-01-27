@@ -13,6 +13,8 @@ class StrategyType(Enum):
     DECREACING_OPP_EVALUATION = auto()
     BALANCE_EVALUATION = auto()
     FLEXIBLE = auto()
+    FORECAST = auto()
+    EVALUATION_THEN_FORECAST = auto()
 
 
 # 駒配置アルゴリズムのインタフェース
@@ -256,3 +258,103 @@ class Flexible(Strategy):
                         y = j
 
         return x, y
+
+
+# 駒配置アルゴリズム
+# 数手先まで読んで駒の数が多くなるように置く
+class Forecast(Strategy):
+
+    def __init__(self, mass_type):
+        super().__init__(mass_type, StrategyType.FORECAST)
+        self.evaluation = [[5, 1, 4, 4, 4, 4, 1, 5],
+                           [1, 1, 2, 2, 2, 2, 1, 1],
+                           [4, 2, 3, 3, 3, 3, 2, 4],
+                           [4, 2, 3, 0, 0, 3, 2, 4],
+                           [4, 2, 3, 0, 0, 3, 2, 4],
+                           [4, 2, 3, 3, 3, 3, 2, 4],
+                           [1, 1, 2, 2, 2, 2, 1, 1],
+                           [5, 1, 4, 4, 4, 4, 1, 5]]
+
+    def put(self, mass_list):
+        max_balance_value = -100
+        x = 0
+        y = 0
+
+        opp_mass_type = Util.get_opp_type(self.mass_type)
+
+        max_piece_num = 0
+        FORECAST_TURN = 3
+
+        for i in range(Common.MASS_NUM):
+            for j in range(Common.MASS_NUM):
+                if Util.can_put(mass_list, i, j, self.mass_type):
+                    mass_list_process = Util.copy_mass_list(mass_list)
+
+                    # まず今回の探索位置におく
+                    mass_list_process = Util.reverse(mass_list_process, i, j, self.mass_type)
+
+                    # 指定ターン数先まで繰り返す
+                    for count in range(FORECAST_TURN):
+
+                        # 敵→自分→敵→自分の順番
+                        if count % 2 == 0:
+                            turn_mass_type = opp_mass_type
+                        else:
+                            turn_mass_type = self.mass_type
+
+                        # 一番多くひっくり返せるところに置く
+                        this_x, this_y = self.put_most_piece(mass_list_process, turn_mass_type)
+                        if this_x != 0 and this_y != 0:
+                            mass_list_process = Util.reverse(mass_list_process, this_x, this_y, turn_mass_type)
+
+                        # どちらも置けなくなったら強制終了
+                        if Util.can_put_somewhere(mass_list_process, self.mass_type) or Util.can_put_somewhere(mass_list_process, opp_mass_type):
+                            break
+
+                    # 数ターン後の自分の枚数
+                    final_piece_num = Util.get_piece_num(mass_list_process, self.mass_type)
+
+                    # 現時点の最大値より大きければ更新
+                    if max_piece_num < final_piece_num:
+                        max_piece_num = final_piece_num
+                        x = i
+                        y = j
+
+
+        return x, y
+
+
+
+    def put_most_piece(self, mass_list, mass_type):
+        reversible_max = 0
+        x = 0
+        y = 0
+
+        for i in range(Common.MASS_NUM):
+            for j in range(Common.MASS_NUM):
+                if Util.can_put(mass_list, i, j, mass_type):
+
+                    reversible_num = Util.get_reversible_num(mass_list, i, j, mass_type)
+                    if reversible_max < reversible_num:
+                        reversible_max = reversible_num
+                        x = i
+                        y = j
+
+        return x, y
+
+
+# 駒配置アルゴリズム
+#
+class EvaluationThenForecast(Strategy):
+
+    def __init__(self, mass_type):
+        super().__init__(mass_type, StrategyType.EVALUATION_THEN_FORECAST)
+        self.evaluation_strategy = EvaluationRandomStrategy(mass_type)
+        self.forecast_strategy = Forecast(mass_type)
+
+    def put(self, mass_list):
+
+        if Util.get_piece_num(mass_list, self.mass_type) + Util.get_piece_num(mass_list, Util.get_opp_type(self.mass_type)) < 56:
+            return self.evaluation_strategy.put(mass_list)
+        else:
+            return self.forecast_strategy.put(mass_list)

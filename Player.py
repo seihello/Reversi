@@ -27,6 +27,10 @@ class Player:
 			self.strategy = BalanceEvaluation(self.mass_type)
 		elif strategy_type == StrategyType.FLEXIBLE:
 			self.strategy = Flexible(self.mass_type)
+		elif strategy_type == StrategyType.FORECAST:
+			self.strategy = Forecast(self.mass_type)
+		elif strategy_type == StrategyType.EVALUATION_THEN_FORECAST:
+			self.strategy = EvaluationThenForecast(self.mass_type)
 		else:
 			pass
 

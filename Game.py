@@ -51,9 +51,9 @@ class Game:
 
 		# CPUが使用する駒配置アルゴリズムをセット
 		if black_player_type == PlayerType.CPU:
-			self.players[MassType.BLACK].set_strategy(StrategyType.FLEXIBLE)
+			self.players[MassType.BLACK].set_strategy(StrategyType.EVALUATION_RANDOM)
 		if white_player_type == PlayerType.CPU:
-			self.players[MassType.WHITE].set_strategy(StrategyType.EVALUATION_RANDOM)
+			self.players[MassType.WHITE].set_strategy(StrategyType.EVALUATION_THEN_FORECAST)
 
 		# スコアを初期化
 		self.players[MassType.BLACK].score = 2
@@ -150,6 +150,3 @@ class Game:
 							self.players[MassType.BLACK].score,
 							self.players[MassType.WHITE].score,
 							self.turn)
-
-
-
