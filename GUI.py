@@ -7,8 +7,8 @@ from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import messagebox
 
-class GUI:
 
+class GUI:
 
 	def __init__(self, root, game):
 		self.root = root
@@ -17,7 +17,7 @@ class GUI:
 		self.top_frame = tk.Frame(self.root, width=Common.WINDOW_WIDTH, height=Common.WINDOW_HEIGHT, bg='#006400')
 
 		self.logo_canvas = tk.Canvas(self.top_frame, width=Common.WINDOW_WIDTH, height=200,
-											highlightthickness=0, bg=self.top_frame['bg'])
+									 highlightthickness=0, bg=self.top_frame['bg'])
 		self.logo_canvas.place(x=0, y=0)
 
 		logo_image_tmp = Image.open('logo.png')
@@ -53,9 +53,13 @@ class GUI:
 		# 対戦画面
 		self.game_frame = tk.Frame(self.root, width=Common.WINDOW_WIDTH, height=Common.WINDOW_HEIGHT, bg='Grey')
 
-		self.board_canvas = tk.Canvas(self.game_frame, width=Common.BOARD_WIDTH, height=Common.BOARD_HEIGHT,
+		self.game_canvas = tk.Canvas(self.game_frame, width=Common.WINDOW_WIDTH, height=Common.WINDOW_HEIGHT,
+									 highlightthickness=0, background='Gray')
+		self.game_canvas.place(x=0, y=0)
+
+		self.board_canvas = tk.Canvas(self.game_canvas, width=Common.BOARD_WIDTH, height=Common.BOARD_HEIGHT,
 									  highlightthickness=0, background='#006400')
-		self.board_canvas.place(x=0, y=0)
+		self.board_canvas.place(x=Common.MASS_INDEX_WIDTH, y=Common.MASS_INDEX_HEIGHT)
 		self.board_canvas.bind('<ButtonPress-1>', game.on_clicked_mass)
 
 		# 得点表示画面の準備
@@ -64,7 +68,7 @@ class GUI:
 
 		self.black_score_canvas = tk.Canvas(self.game_frame, width=Common.SCORE_WIDTH, height=Common.SCORE_HEIGHT,
 											highlightthickness=0, bg='Red')
-		self.black_score_canvas.place(x=Common.BOARD_WIDTH, y=0)
+		self.black_score_canvas.place(x=Common.MASS_INDEX_WIDTH + Common.BOARD_WIDTH, y=Common.MASS_INDEX_HEIGHT)
 		self.black_score_canvas.create_oval(piece_offset_x,
 											piece_offset_y,
 											piece_offset_x + Common.SCORE_PIECE_SIZE,
@@ -79,7 +83,8 @@ class GUI:
 
 		self.white_score_canvas = tk.Canvas(self.game_frame, width=Common.SCORE_WIDTH, height=Common.SCORE_HEIGHT,
 											highlightthickness=0, bg='Black')
-		self.white_score_canvas.place(x=Common.BOARD_WIDTH, y=Common.SCORE_HEIGHT + Common.BUTTON_HEIGHT * 2)
+		self.white_score_canvas.place(x=Common.MASS_INDEX_WIDTH + Common.BOARD_WIDTH,
+									  y=Common.MASS_INDEX_HEIGHT + Common.SCORE_HEIGHT + Common.BUTTON_HEIGHT * 3)
 		self.white_score_canvas.create_oval(piece_offset_x,
 											piece_offset_y,
 											piece_offset_x + Common.SCORE_PIECE_SIZE,
@@ -92,17 +97,26 @@ class GUI:
 											font=("MSゴシック", "60", "bold"),
 											tag='white_score')
 
-		self.top_back_button = BButton(self.game_frame, text='Topに戻る', font=("MSゴシック", "24", "bold"),
-									   fg='Black', bg='Grey',
-									   width=Common.BUTTON_WIDTH, height=Common.BUTTON_HEIGHT,
-									   command=game.on_clicked_top_back_button)
-		self.top_back_button.place(x=Common.BOARD_WIDTH, y=Common.SCORE_HEIGHT)
+		self.undo_button = BButton(self.game_frame, text='1手戻る', font=("MSゴシック", "24", "bold"),
+								   fg='Black', bg='Grey',
+								   width=Common.BUTTON_WIDTH, height=Common.BUTTON_HEIGHT,
+								   command=game.on_clicked_undo_button)
+		self.undo_button.place(x=Common.MASS_INDEX_WIDTH + Common.BOARD_WIDTH,
+							   y=Common.MASS_INDEX_HEIGHT + Common.SCORE_HEIGHT)
 
 		self.restart_button = BButton(self.game_frame, text='はじめから', font=("MSゴシック", "24", "bold"),
 									  fg='Black', bg='Grey',
 									  width=Common.BUTTON_WIDTH, height=Common.BUTTON_HEIGHT,
 									  command=game.on_clicked_restart_button)
-		self.restart_button.place(x=Common.BOARD_WIDTH, y=Common.SCORE_HEIGHT + Common.BUTTON_HEIGHT)
+		self.restart_button.place(x=Common.MASS_INDEX_WIDTH + Common.BOARD_WIDTH,
+								  y=Common.MASS_INDEX_HEIGHT + Common.SCORE_HEIGHT + Common.BUTTON_HEIGHT)
+
+		self.top_back_button = BButton(self.game_frame, text='Topに戻る', font=("MSゴシック", "24", "bold"),
+									   fg='Black', bg='Grey',
+									   width=Common.BUTTON_WIDTH, height=Common.BUTTON_HEIGHT,
+									   command=game.on_clicked_top_back_button)
+		self.top_back_button.place(x=Common.MASS_INDEX_WIDTH + Common.BOARD_WIDTH,
+								   y=Common.MASS_INDEX_HEIGHT + Common.SCORE_HEIGHT + Common.BUTTON_HEIGHT * 2)
 
 		self.score_canvas = {
 			MassType.BLACK: self.black_score_canvas,
@@ -110,9 +124,34 @@ class GUI:
 		}
 
 		for i in range(9):
-			self.board_canvas.create_line(Common.MASS_SIZE * i, 0, Common.MASS_SIZE * i, Common.BOARD_WIDTH, fill='White')
+			self.game_canvas.create_line(Common.MASS_INDEX_WIDTH + Common.MASS_SIZE * i, 0,
+										 Common.MASS_INDEX_WIDTH + Common.MASS_SIZE * i, Common.BOARD_WIDTH,
+										 fill='White')
 		for j in range(9):
-			self.board_canvas.create_line(0, Common.MASS_SIZE * j, Common.BOARD_HEIGHT, Common.MASS_SIZE * j, fill='White')
+			self.game_canvas.create_line(0, Common.MASS_INDEX_HEIGHT + Common.MASS_SIZE * j, Common.BOARD_HEIGHT,
+										 Common.MASS_INDEX_HEIGHT + Common.MASS_SIZE * j, fill='White')
+
+		for i in range(8):
+			self.game_canvas.create_text(Common.MASS_INDEX_WIDTH + Common.MASS_SIZE * i + 40,
+										 20,
+										 text=str(i+1),
+										 fill='Black',
+										 font=("MSゴシック", "32", "bold"),
+										 tag='black_score')
+
+			self.game_canvas.create_text(20,
+										 Common.MASS_INDEX_HEIGHT + Common.MASS_SIZE * i + 40,
+										 text=str(i + 1),
+										 fill='Black',
+										 font=("MSゴシック", "32", "bold"),
+										 tag='black_score')
+
+		for i in range(9):
+			self.board_canvas.create_line(Common.MASS_SIZE * i, 0, Common.MASS_SIZE * i, Common.BOARD_WIDTH,
+										  fill='White')
+		for j in range(9):
+			self.board_canvas.create_line(0, Common.MASS_SIZE * j, Common.BOARD_HEIGHT, Common.MASS_SIZE * j,
+										  fill='White')
 
 		self.piece_id_set = set()
 		self.puttable_id_set = set()

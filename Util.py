@@ -4,6 +4,22 @@ from MassType import MassType
 class Util:
 
 	@staticmethod
+	def get_initial_mass_list():
+		# 盤面を初期化
+		mass_list = [[MassType.EMPTY] * Common.MASS_NUM for i in range(Common.MASS_NUM)]
+		for i in range(Common.MASS_NUM):
+			for j in range(Common.MASS_NUM):
+				mass_list[i][j] = MassType.EMPTY
+
+		# 初期配置
+		mass_list[3][3] = MassType.BLACK
+		mass_list[3][4] = MassType.WHITE
+		mass_list[4][3] = MassType.WHITE
+		mass_list[4][4] = MassType.BLACK
+
+		return mass_list
+
+	@staticmethod
 	def get_puttable_list(mass_list, mass_type):
 		puttable_list = [[0 for i in range(Common.MASS_NUM)] for j in range(Common.MASS_NUM)]
 		for i in range(Common.MASS_NUM):
