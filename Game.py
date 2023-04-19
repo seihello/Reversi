@@ -1,13 +1,12 @@
 from Board import *
 from Common import Common
 from GUI import GUI
-from Log import Log
 from MassType import MassType
 from Player import Player, PlayerType
 from Strategy import StrategyType
 from Util import Util
 
-#import pygame
+import pygame
 
 
 class Game:
@@ -16,8 +15,6 @@ class Game:
 
 		self.root = parent
 		self.gui = GUI(parent, self)
-
-		self.log = Log('log.txt')
 
 		self.players = {
 			MassType.BLACK: Player(MassType.BLACK),
@@ -29,10 +26,10 @@ class Game:
 	def start_app(self):
 
 		# BGMの再生を開始
-		# pygame.mixer.init()
-		# pygame.mixer.music.set_volume(0.10)
-		# self.bgm = pygame.mixer.Sound('bgm.wav')
-		# self.bgm.play(-1)
+		pygame.mixer.init()
+		pygame.mixer.music.set_volume(0.10)
+		self.bgm = pygame.mixer.Sound('bgm.wav')
+		self.bgm.play(-1)
 
 		# Top画面を表示
 		self.gui.show_top()
@@ -89,29 +86,6 @@ class Game:
 		self.gui.show_game()
 		self.start_game(PlayerType.CPU, PlayerType.CPU)
 
-	def on_clicked_undo_button(self):
-		# CPUのターンのクリックは無視
-		if self.players[self.turn].type == PlayerType.HUMAN:
-			# 盤面の描画をクリア
-			self.gui.clear_board()
-
-			mass_list = self.log.get_board_last_player_turn(self.turn)
-
-			# 盤面を初期化
-			self.board = Board()
-			self.board.set_mass_list(mass_list)
-
-			# スコアを初期化
-			self.players[MassType.BLACK].score = Util.get_piece_num(mass_list, MassType.BLACK)
-			self.players[MassType.WHITE].score = Util.get_piece_num(mass_list, MassType.WHITE)
-			print(str(self.players[MassType.BLACK].score))
-			print(str(self.players[MassType.WHITE].score))
-
-			# 盤面を描画
-			self.gui.clear_latest_mass()
-			self.update_board()
-
-
 	def on_clicked_top_back_button(self):
 		self.gui.show_top()
 
@@ -138,9 +112,6 @@ class Game:
 
 	def update(self, x, y):
 		if self.board.update(x, y, self.turn):
-
-			# ログ書き込み
-			self.log.write(self.turn, x, y)
 
 			# スコアを更新
 			self.players[MassType.BLACK].score = self.board.get_piece_num(MassType.BLACK)

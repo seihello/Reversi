@@ -6,10 +6,17 @@ class Board:
 
 	def __init__(self):
 
-		self.mass_list = Util.get_initial_mass_list()
+		# 盤面を初期化
+		self.mass_list = [[MassType.EMPTY] * Common.MASS_NUM for i in range(Common.MASS_NUM)]
+		for i in range(Common.MASS_NUM):
+			for j in range(Common.MASS_NUM):
+				self.mass_list[i][j] = MassType.EMPTY
 
-	def set_mass_list(self, mass_list):
-		self.mass_list = mass_list
+		# 初期配置
+		self.mass_list[3][3] = MassType.WHITE
+		self.mass_list[3][4] = MassType.BLACK
+		self.mass_list[4][3] = MassType.BLACK
+		self.mass_list[4][4] = MassType.WHITE
 
 	def update(self, x, y, mass_type):
 
